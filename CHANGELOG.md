@@ -3,6 +3,21 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v0.1.19](https://github.com/Bejibun-Framework/bejibun-cache/compare/v0.1.16...v0.1.19) - 2026-03-02
+
+### 🩹 Fixes
+
+### 📖 Changes
+#### Upgrade [@bejibun/redis](https://github.com/Bejibun-Framework/bejibun-redis) to v0.1.39
+[https://github.com/Bejibun-Framework/bejibun-redis/releases/tag/v0.1.39](https://github.com/Bejibun-Framework/bejibun-redis/releases/tag/v0.1.39)
+
+### ❤️Contributors
+- Havea Crenata ([@crenata](https://github.com/crenata))
+
+**Full Changelog**: https://github.com/Bejibun-Framework/bejibun-cache/blob/master/CHANGELOG.md
+
+---
+
 ## [v0.1.16](https://github.com/Bejibun-Framework/bejibun-cache/compare/v0.1.15...v0.1.16) - 2025-12-15
 
 ### 🩹 Fixes

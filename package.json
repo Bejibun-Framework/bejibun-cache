@@ -1,6 +1,6 @@
 {
     "name": "@bejibun/cache",
-    "version": "0.1.18",
+    "version": "0.1.19",
     "author": "Havea Crenata <havea.crenata@gmail.com>",
     "repository": {
         "type": "git",
@@ -35,9 +35,9 @@
     "type": "module",
     "types": "index.d.ts",
     "dependencies": {
-        "@bejibun/app": "^0.1.22",
+        "@bejibun/app": "^0.1.23",
         "@bejibun/logger": "^0.1.22",
-        "@bejibun/redis": "^0.1.36",
+        "@bejibun/redis": "^0.1.39",
         "@bejibun/utils": "^0.1.28"
     }
 }

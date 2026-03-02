@@ -7,8 +7,8 @@ import Enum from "@bejibun/utils/facades/Enum";
 import fs from "fs";
 import path from "path";
 import CacheConfig from "../config/cache";
-import CacheException from "../exceptions/CacheException";
 import CacheDriverEnum from "../enums/CacheDriverEnum";
+import CacheException from "../exceptions/CacheException";
 export default class CacheBuilder {
     conf;
     conn;
@@ -51,11 +51,11 @@ export default class CacheBuilder {
         if (!Enum.setEnums(CacheDriverEnum).hasValue(driver))
             throw new CacheException(`Not supported "driver" cache.`);
         switch (driver) {
-            case "local":
+            case CacheDriverEnum.Local:
                 if (isEmpty(this.currentConnection?.path))
                     throw new CacheException(`Missing "path" for "local" cache configuration.`);
                 break;
-            case "redis":
+            case CacheDriverEnum.Redis:
                 if (isEmpty(this.currentConnection?.host))
                     throw new CacheException(`Missing "host" for "redis" cache configuration.`);
                 if (isEmpty(this.currentConnection?.port))
@@ -118,7 +118,7 @@ export default class CacheBuilder {
     async remember(key, callback, ttl) {
         let data;
         switch (this.driver) {
-            case "local":
+            case CacheDriverEnum.Local:
                 const raw = await this.getFile(key);
                 data = raw.data;
                 if (isEmpty(data)) {
@@ -126,7 +126,7 @@ export default class CacheBuilder {
                     await this.setFile(key, data, ttl);
                 }
                 break;
-            case "redis":
+            case CacheDriverEnum.Redis:
                 data = await this.redis.get(this.key(key));
                 if (isEmpty(data)) {
                     data = callback();
@@ -142,11 +142,11 @@ export default class CacheBuilder {
     async has(key) {
         let data;
         switch (this.driver) {
-            case "local":
+            case CacheDriverEnum.Local:
                 const raw = await this.getFile(key);
                 data = raw.data;
                 break;
-            case "redis":
+            case CacheDriverEnum.Redis:
                 data = await this.redis.get(this.key(key));
                 break;
             default:
@@ -158,11 +158,11 @@ export default class CacheBuilder {
     async get(key) {
         let data;
         switch (this.driver) {
-            case "local":
+            case CacheDriverEnum.Local:
                 const raw = await this.getFile(key);
                 data = raw.data;
                 break;
-            case "redis":
+            case CacheDriverEnum.Redis:
                 data = await this.redis.get(this.key(key));
                 break;
             default:
@@ -176,11 +176,11 @@ export default class CacheBuilder {
         let data;
         try {
             switch (this.driver) {
-                case "local":
+                case CacheDriverEnum.Local:
                     const raw = await this.getFile(key);
                     data = raw.data;
                     break;
-                case "redis":
+                case CacheDriverEnum.Redis:
                     data = await this.redis.get(this.key(key));
                     break;
                 default:
@@ -189,10 +189,10 @@ export default class CacheBuilder {
             }
             if (isEmpty(data)) {
                 switch (this.driver) {
-                    case "local":
+                    case CacheDriverEnum.Local:
                         await this.setFile(key, value, ttl);
                         break;
-                    case "redis":
+                    case CacheDriverEnum.Redis:
                         await this.redis.set(this.key(key), value, ttl);
                         break;
                     default:
@@ -214,10 +214,10 @@ export default class CacheBuilder {
         let status = true;
         try {
             switch (this.driver) {
-                case "local":
+                case CacheDriverEnum.Local:
                     await this.setFile(key, value, ttl);
                     break;
-                case "redis":
+                case CacheDriverEnum.Redis:
                     await this.redis.set(this.key(key), value, ttl);
                     break;
                 default:
@@ -232,7 +232,7 @@ export default class CacheBuilder {
     }
     async forget(key) {
         switch (this.driver) {
-            case "local":
+            case CacheDriverEnum.Local:
                 try {
                     await this.file(key).delete();
                 }
@@ -240,7 +240,7 @@ export default class CacheBuilder {
                     break;
                 }
                 break;
-            case "redis":
+            case CacheDriverEnum.Redis:
                 await this.redis.del(this.key(key));
                 break;
             default:
@@ -250,7 +250,7 @@ export default class CacheBuilder {
     async increment(key, ttl) {
         let data;
         switch (this.driver) {
-            case "local":
+            case CacheDriverEnum.Local:
                 const raw = await this.getFile(key);
                 data = Number(raw.data);
                 if (isEmpty(data)) {
@@ -262,7 +262,7 @@ export default class CacheBuilder {
                     await this.setFile(key, String(data), ttl);
                 }
                 break;
-            case "redis":
+            case CacheDriverEnum.Redis:
                 data = Number(await this.redis.get(this.key(key)));
                 if (isEmpty(data)) {
                     data = 1;
@@ -282,7 +282,7 @@ export default class CacheBuilder {
     async decrement(key, ttl) {
         let data;
         switch (this.driver) {
-            case "local":
+            case CacheDriverEnum.Local:
                 const raw = await this.getFile(key);
                 data = Number(raw.data);
                 if (isEmpty(data)) {
@@ -294,7 +294,7 @@ export default class CacheBuilder {
                     await this.setFile(key, String(data), ttl);
                 }
                 break;
-            case "redis":
+            case CacheDriverEnum.Redis:
                 data = Number(await this.redis.get(this.key(key)));
                 if (isEmpty(data)) {
                     data = -1;
