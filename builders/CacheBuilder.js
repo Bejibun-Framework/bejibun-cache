@@ -13,7 +13,7 @@ export default class CacheBuilder {
     conf;
     conn;
     prefix;
-    redis;
+    rds;
     constructor() {
         const configPath = App.Path.configPath("cache.ts");
         let config;
@@ -21,20 +21,26 @@ export default class CacheBuilder {
             config = require(configPath).default;
         else
             config = CacheConfig;
-        const redisConnection = defineValue(config.connections?.redis, {
-            host: "127.0.0.1",
-            port: 6379,
-            password: "",
-            database: 0
-        });
         this.conf = config;
         this.prefix = "bejibun-cache";
-        this.redis = Redis.setClient({
-            host: redisConnection.host,
-            port: redisConnection.port,
-            password: redisConnection.password,
-            database: redisConnection.database
-        }, this.prefix);
+    }
+    get redis() {
+        if (isEmpty(this.rds)) {
+            const redisConnection = defineValue(this.conf.connections?.redis, {
+                host: "127.0.0.1",
+                port: 6379,
+                password: "",
+                database: 0
+            });
+            this.rds = Redis.setClient({
+                host: redisConnection.host,
+                port: redisConnection.port,
+                password: redisConnection.password,
+                database: redisConnection.database
+            }, this.prefix);
+            return this.rds;
+        }
+        return this.rds;
     }
     get config() {
         if (isEmpty(this.conf))

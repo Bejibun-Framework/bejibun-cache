@@ -2,8 +2,9 @@ export default class CacheBuilder {
     protected conf: Record<string, any>;
     protected conn?: string;
     protected prefix: string;
-    protected redis: Record<string, Function>;
+    protected rds?: Record<string, Function>;
     constructor();
+    private get redis();
     private get config();
     private get currentConnection();
     private get driver();
