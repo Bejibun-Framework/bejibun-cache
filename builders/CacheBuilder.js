@@ -34,7 +34,7 @@ export default class CacheBuilder {
             port: redisConnection.port,
             password: redisConnection.password,
             database: redisConnection.database
-        });
+        }, this.prefix);
     }
     get config() {
         if (isEmpty(this.conf))

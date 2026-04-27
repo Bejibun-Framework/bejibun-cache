@@ -1,7 +1,7 @@
 import App from "@bejibun/app";
 import CacheDriverEnum from "../enums/CacheDriverEnum";
 const config = {
-    default: "local",
+    default: "redis",
     connections: {
         local: {
             driver: CacheDriverEnum.Local,
