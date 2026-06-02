@@ -80,6 +80,8 @@ await Cache.put("key", "Lorem ipsum", 60 /* seconds */); // boolean
 await Cache.forget("key"); // void
 await Cache.increment("key"); // number
 await Cache.decrement("key"); // number
+await Cache.incrementBy("key", 5); // number
+await Cache.decrementBy("key", 5); // number
 ```
 
 ## Contributors
