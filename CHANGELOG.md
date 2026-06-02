@@ -3,6 +3,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v0.1.23](https://github.com/Bejibun-Framework/bejibun-cache/compare/v0.1.22...v0.1.23) - 2026-06-02
+
+### 🩹 Fixes
+
+### 📖 Changes
+- Added `.incrementBy()` Increment a numeric value by a specified amount
+- Added `.decrementBy()` Decrement a numeric value by a specified amount
+
+### 📦 Dependencies
+- Upgraded `@bejibun/redis` to v0.1.45
+
+### ❤️Contributors
+- Havea Crenata ([@crenata](https://github.com/crenata))
+
+**Full Changelog**: https://github.com/Bejibun-Framework/bejibun-cache/blob/master/CHANGELOG.md
+
+---
+
 ## [v0.1.22](https://github.com/Bejibun-Framework/bejibun-cache/compare/v0.1.19...v0.1.22) - 2026-04-27
 
 ### 🩹 Fixes

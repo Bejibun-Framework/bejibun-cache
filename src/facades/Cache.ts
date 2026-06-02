@@ -36,4 +36,12 @@ export default class Cache {
     public static async decrement(key: string, ttl?: number): Promise<number> {
         return new CacheBuilder().decrement(key, ttl);
     }
+
+    public static async incrementBy(key: string, increment: number, ttl?: number): Promise<number> {
+        return new CacheBuilder().incrementBy(key, increment, ttl);
+    }
+
+    public static async decrementBy(key: string, decrement: number, ttl?: number): Promise<number> {
+        return new CacheBuilder().decrementBy(key, decrement, ttl);
+    }
 }

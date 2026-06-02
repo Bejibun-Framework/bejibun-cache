@@ -317,4 +317,68 @@ export default class CacheBuilder {
         }
         return data;
     }
+    async incrementBy(key, increment, ttl) {
+        let data;
+        switch (this.driver) {
+            case CacheDriverEnum.Local:
+                const raw = await this.getFile(key);
+                data = Number(raw.data);
+                if (isEmpty(data)) {
+                    data = increment;
+                    await this.setFile(key, String(data), ttl);
+                }
+                else {
+                    data += increment;
+                    await this.setFile(key, String(data), ttl);
+                }
+                break;
+            case CacheDriverEnum.Redis:
+                data = Number(await this.redis.get(this.key(key)));
+                if (isEmpty(data)) {
+                    data = increment;
+                    await this.redis.set(this.key(key), data, ttl);
+                }
+                else {
+                    data += increment;
+                    await this.redis.set(this.key(key), data, ttl);
+                }
+                break;
+            default:
+                data = 0;
+                break;
+        }
+        return data;
+    }
+    async decrementBy(key, decrement, ttl) {
+        let data;
+        switch (this.driver) {
+            case CacheDriverEnum.Local:
+                const raw = await this.getFile(key);
+                data = Number(raw.data);
+                if (isEmpty(data)) {
+                    data = -decrement;
+                    await this.setFile(key, String(data), ttl);
+                }
+                else {
+                    data -= decrement;
+                    await this.setFile(key, String(data), ttl);
+                }
+                break;
+            case CacheDriverEnum.Redis:
+                data = Number(await this.redis.get(this.key(key)));
+                if (isEmpty(data)) {
+                    data = -decrement;
+                    await this.redis.set(this.key(key), data, ttl);
+                }
+                else {
+                    data -= decrement;
+                    await this.redis.set(this.key(key), data, ttl);
+                }
+                break;
+            default:
+                data = 0;
+                break;
+        }
+        return data;
+    }
 }

@@ -1,6 +1,6 @@
 {
     "name": "@bejibun/cache",
-    "version": "0.1.22",
+    "version": "0.1.23",
     "author": "Havea Crenata <havea.crenata@gmail.com>",
     "repository": {
         "type": "git",
@@ -10,7 +10,7 @@
     "module": "index.js",
     "devDependencies": {
         "@types/bun": "latest",
-        "tsc-alias": "^1.8.16"
+        "tsc-alias": "^1.8.17"
     },
     "bugs": {
         "url": "https://github.com/Bejibun-Framework/bejibun-cache/issues"
@@ -35,9 +35,9 @@
     "type": "module",
     "types": "index.d.ts",
     "dependencies": {
-        "@bejibun/app": "^0.1.23",
+        "@bejibun/app": "^0.1.24",
         "@bejibun/logger": "^0.1.22",
-        "@bejibun/redis": "^0.1.44",
+        "@bejibun/redis": "^0.1.45",
         "@bejibun/utils": "^0.1.28"
     }
 }

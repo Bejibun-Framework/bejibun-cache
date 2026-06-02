@@ -22,4 +22,6 @@ export default class CacheBuilder {
     forget(key: string): Promise<void>;
     increment(key: string, ttl?: number): Promise<number>;
     decrement(key: string, ttl?: number): Promise<number>;
+    incrementBy(key: string, increment: number, ttl?: number): Promise<number>;
+    decrementBy(key: string, decrement: number, ttl?: number): Promise<number>;
 }

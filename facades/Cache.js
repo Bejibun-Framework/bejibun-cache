@@ -27,4 +27,10 @@ export default class Cache {
     static async decrement(key, ttl) {
         return new CacheBuilder().decrement(key, ttl);
     }
+    static async incrementBy(key, increment, ttl) {
+        return new CacheBuilder().incrementBy(key, increment, ttl);
+    }
+    static async decrementBy(key, decrement, ttl) {
+        return new CacheBuilder().decrementBy(key, decrement, ttl);
+    }
 }

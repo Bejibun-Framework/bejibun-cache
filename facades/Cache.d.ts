@@ -9,4 +9,6 @@ export default class Cache {
     static forget(key: string): Promise<void>;
     static increment(key: string, ttl?: number): Promise<number>;
     static decrement(key: string, ttl?: number): Promise<number>;
+    static incrementBy(key: string, increment: number, ttl?: number): Promise<number>;
+    static decrementBy(key: string, decrement: number, ttl?: number): Promise<number>;
 }
