@@ -7,12 +7,12 @@
       "dependencies": {
         "@bejibun/app": "^0.1.24",
         "@bejibun/logger": "^0.1.22",
-        "@bejibun/redis": "^0.1.45",
+        "@bejibun/redis": "^0.1.46",
         "@bejibun/utils": "^0.1.28",
       },
       "devDependencies": {
         "@types/bun": "latest",
-        "tsc-alias": "^1.8.17",
+        "tsc-alias": "^1.9.1",
       },
     },
   },
@@ -21,7 +21,7 @@
 
     "@bejibun/logger": ["@bejibun/logger@0.1.22", "", { "dependencies": { "@bejibun/utils": "^0.1.18", "chalk": "^5.6.2" } }, "sha512-wME87l5gLKyg3H5Gi7K+Epb4pccHOXQKpq7EngJOmE4NJF8YLeWIRwG/M3KDT5zcwnyFKMkQUlfmdaasOqcNqA=="],
 
-    "@bejibun/redis": ["@bejibun/redis@0.1.45", "", { "dependencies": { "@bejibun/app": "^0.1.24", "@bejibun/logger": "^0.1.22", "@bejibun/utils": "^0.1.28" } }, "sha512-m0r/hNNnau+uOmsANOFipjtx4Uy8eqUT4PIT28WYvWkc8/jGhuZfGkStw9VDQCFTfbvqZv9Lz+iHdRH1Se9OYQ=="],
+    "@bejibun/redis": ["@bejibun/redis@0.1.46", "", { "dependencies": { "@bejibun/app": "^0.1.24", "@bejibun/logger": "^0.1.22", "@bejibun/utils": "^0.1.28" } }, "sha512-Qa4jP607g1aOMsc/e5jq2j1JcSm64B83CGu92LJjgDA/GoyEoo8JI4M02QNFNLnPGaqa8cLA7XpFM3D2S7cDyQ=="],
 
     "@bejibun/utils": ["@bejibun/utils@0.1.28", "", { "dependencies": { "@bejibun/logger": "^0.1.18", "luxon": "^3.7.2" } }, "sha512-0EWXVcQ4JspwRIVfYkuLoGsrD92zgMLITNifchOALIBQ7B5Q8nfIUmAS0oRU0tbQHLGWjDMOjWWKZ2KiITqmYQ=="],
 
@@ -109,7 +109,7 @@
 
     "to-regex-range": ["to-regex-range@5.0.1", "", { "dependencies": { "is-number": "^7.0.0" } }, "sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ=="],
 
-    "tsc-alias": ["tsc-alias@1.8.17", "", { "dependencies": { "chokidar": "^3.5.3", "commander": "^9.0.0", "get-tsconfig": "^4.10.0", "globby": "^11.0.4", "mylas": "^2.1.9", "normalize-path": "^3.0.0", "plimit-lit": "^1.2.6" }, "bin": { "tsc-alias": "dist/bin/index.js" } }, "sha512-EIduCZHqbNwPm8BZYfq1aD7BQ697A4h6uSGMOFQfYGoQwfrYFTKwYfy9Bv42YxHkduVBcn9Zx0DkX111DKskyg=="],
+    "tsc-alias": ["tsc-alias@1.9.1", "", { "dependencies": { "chokidar": "^3.5.3", "commander": "^9.0.0", "get-tsconfig": "^4.10.0", "globby": "^11.0.4", "mylas": "^2.1.9", "normalize-path": "^3.0.0", "plimit-lit": "^1.2.6" }, "bin": { "tsc-alias": "dist/bin/index.js" } }, "sha512-sFZdVFthH8uvdplPJrOYGOHcxu6UPtcAcY678JPwEQiMzgLZYFO7Qc/rzELp7ingTc+OxtzH6n+8Pn2eVQep6w=="],
 
     "undici-types": ["undici-types@7.16.0", "", {}, "sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw=="],
 

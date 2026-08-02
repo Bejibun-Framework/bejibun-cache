@@ -9,9 +9,8 @@
         "moduleResolution": "bundler",
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "baseUrl": ".",
         "paths": {
-            "@/*": ["src/*"]
+            "@/*": ["./src/*"]
         },
         "ignoreDeprecations": "6.0",
         "types": ["bun-types"]
