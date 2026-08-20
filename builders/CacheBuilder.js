@@ -113,7 +113,9 @@ export default class CacheBuilder {
             }
         }
         catch (error) {
-            Logger.setContext("Cache").error("Something went wrong when processing cache file.").trace(error);
+            Logger.setContext("Cache")
+                .error("Something went wrong when processing cache file.")
+                .trace(error);
         }
         return metadata;
     }
@@ -124,7 +126,7 @@ export default class CacheBuilder {
     async remember(key, callback, ttl) {
         let data;
         switch (this.driver) {
-            case CacheDriverEnum.Local:
+            case CacheDriverEnum.Local: {
                 const raw = await this.getFile(key);
                 data = raw.data;
                 if (isEmpty(data)) {
@@ -132,6 +134,7 @@ export default class CacheBuilder {
                     await this.setFile(key, data, ttl);
                 }
                 break;
+            }
             case CacheDriverEnum.Redis:
                 data = await this.redis.get(this.key(key));
                 if (isEmpty(data)) {
@@ -148,10 +151,11 @@ export default class CacheBuilder {
     async has(key) {
         let data;
         switch (this.driver) {
-            case CacheDriverEnum.Local:
+            case CacheDriverEnum.Local: {
                 const raw = await this.getFile(key);
                 data = raw.data;
                 break;
+            }
             case CacheDriverEnum.Redis:
                 data = await this.redis.get(this.key(key));
                 break;
@@ -164,10 +168,11 @@ export default class CacheBuilder {
     async get(key) {
         let data;
         switch (this.driver) {
-            case CacheDriverEnum.Local:
+            case CacheDriverEnum.Local: {
                 const raw = await this.getFile(key);
                 data = raw.data;
                 break;
+            }
             case CacheDriverEnum.Redis:
                 data = await this.redis.get(this.key(key));
                 break;
@@ -182,10 +187,11 @@ export default class CacheBuilder {
         let data;
         try {
             switch (this.driver) {
-                case CacheDriverEnum.Local:
+                case CacheDriverEnum.Local: {
                     const raw = await this.getFile(key);
                     data = raw.data;
                     break;
+                }
                 case CacheDriverEnum.Redis:
                     data = await this.redis.get(this.key(key));
                     break;
@@ -242,7 +248,7 @@ export default class CacheBuilder {
                 try {
                     await this.file(key).delete();
                 }
-                catch (error) {
+                catch {
                     break;
                 }
                 break;
@@ -256,7 +262,7 @@ export default class CacheBuilder {
     async increment(key, ttl) {
         let data;
         switch (this.driver) {
-            case CacheDriverEnum.Local:
+            case CacheDriverEnum.Local: {
                 const raw = await this.getFile(key);
                 data = Number(raw.data);
                 if (isEmpty(data)) {
@@ -268,6 +274,7 @@ export default class CacheBuilder {
                     await this.setFile(key, String(data), ttl);
                 }
                 break;
+            }
             case CacheDriverEnum.Redis:
                 data = Number(await this.redis.get(this.key(key)));
                 if (isEmpty(data)) {
@@ -288,7 +295,7 @@ export default class CacheBuilder {
     async decrement(key, ttl) {
         let data;
         switch (this.driver) {
-            case CacheDriverEnum.Local:
+            case CacheDriverEnum.Local: {
                 const raw = await this.getFile(key);
                 data = Number(raw.data);
                 if (isEmpty(data)) {
@@ -300,6 +307,7 @@ export default class CacheBuilder {
                     await this.setFile(key, String(data), ttl);
                 }
                 break;
+            }
             case CacheDriverEnum.Redis:
                 data = Number(await this.redis.get(this.key(key)));
                 if (isEmpty(data)) {
@@ -320,7 +328,7 @@ export default class CacheBuilder {
     async incrementBy(key, increment, ttl) {
         let data;
         switch (this.driver) {
-            case CacheDriverEnum.Local:
+            case CacheDriverEnum.Local: {
                 const raw = await this.getFile(key);
                 data = Number(raw.data);
                 if (isEmpty(data)) {
@@ -332,6 +340,7 @@ export default class CacheBuilder {
                     await this.setFile(key, String(data), ttl);
                 }
                 break;
+            }
             case CacheDriverEnum.Redis:
                 data = Number(await this.redis.get(this.key(key)));
                 if (isEmpty(data)) {
@@ -352,7 +361,7 @@ export default class CacheBuilder {
     async decrementBy(key, decrement, ttl) {
         let data;
         switch (this.driver) {
-            case CacheDriverEnum.Local:
+            case CacheDriverEnum.Local: {
                 const raw = await this.getFile(key);
                 data = Number(raw.data);
                 if (isEmpty(data)) {
@@ -364,6 +373,7 @@ export default class CacheBuilder {
                     await this.setFile(key, String(data), ttl);
                 }
                 break;
+            }
             case CacheDriverEnum.Redis:
                 data = Number(await this.redis.get(this.key(key)));
                 if (isEmpty(data)) {

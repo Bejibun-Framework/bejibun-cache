@@ -5,7 +5,7 @@ export default class Cache {
         return new CacheBuilder().connection(connection);
     }
 
-    public static async remember(key: string, callback: Function, ttl?: number): Promise<any> {
+    public static async remember(key: string, callback: () => {}, ttl?: number): Promise<any> {
         return new CacheBuilder().remember(key, callback, ttl);
     }
 

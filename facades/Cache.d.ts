@@ -1,7 +1,7 @@
 import CacheBuilder from "../builders/CacheBuilder";
 export default class Cache {
     static connection(connection: string): CacheBuilder;
-    static remember(key: string, callback: Function, ttl?: number): Promise<any>;
+    static remember(key: string, callback: () => {}, ttl?: number): Promise<any>;
     static has(key: string): Promise<boolean>;
     static get(key: string): Promise<any>;
     static add(key: string, value: any, ttl?: number): Promise<boolean>;

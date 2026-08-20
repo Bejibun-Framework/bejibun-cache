@@ -2,7 +2,7 @@ export default class CacheBuilder {
     protected conf: Record<string, any>;
     protected conn?: string;
     protected prefix: string;
-    protected rds?: Record<string, Function>;
+    protected rds?: Record<string, any>;
     constructor();
     private get redis();
     private get config();
@@ -14,7 +14,7 @@ export default class CacheBuilder {
     private setFile;
     private getFile;
     connection(conn: string): CacheBuilder;
-    remember(key: string, callback: Function, ttl?: number): Promise<any>;
+    remember(key: string, callback: () => {}, ttl?: number): Promise<any>;
     has(key: string): Promise<boolean>;
     get(key: string): Promise<any>;
     add(key: string, value: any, ttl?: number): Promise<boolean>;
