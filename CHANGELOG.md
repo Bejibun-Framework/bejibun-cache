@@ -39,9 +39,6 @@ All notable changes to this project will be documented in this file.
 - Bumped `tsc-alias` (devDependency) from `^1.9.2` to `^1.9.3`
 - Bumped `typescript-eslint` (devDependency) from `^8.67.0` to `^8.69.0`
 
-### 📦 Dependencies
-- Upgraded `@bejibun/redis` to v0.1.46
-
 ### ❤️Contributors
 - Havea Crenata ([@crenata](https://github.com/crenata))
 
