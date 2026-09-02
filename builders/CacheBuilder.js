@@ -1,60 +1,107 @@
 import App from "@bejibun/app";
 import Logger from "@bejibun/logger";
 import Redis from "@bejibun/redis";
-import Luxon from "@bejibun/utils/facades/Luxon";
 import { defineValue, isEmpty, isNotEmpty } from "@bejibun/utils";
-import Enum from "@bejibun/utils/facades/Enum";
-import fs from "fs";
+import { mkdir } from "fs/promises";
 import path from "path";
-import CacheConfig from "../config/cache";
 import CacheDriverEnum from "../enums/CacheDriverEnum";
 import CacheException from "../exceptions/CacheException";
+/** The app cache config, loaded once from disk. */
+let cachedConfig;
+/** The Redis clients already created per cache prefix. */
+const cachedClients = new Map();
+/** The set of cache drivers this builder supports. */
+const validDrivers = new Set(Object.values(CacheDriverEnum));
+/** Resolves the current unix timestamp in seconds. */
+const unix = () => Math.floor(Date.now() / 1000);
+/**
+ * Loads the app cache config from disk once, falling back to the built-in default.
+ *
+ * @returns {any} The loaded cache configuration.
+ */
+const loadConfig = () => {
+    if (cachedConfig)
+        return cachedConfig;
+    try {
+        cachedConfig = require(App.Path.configPath("cache.ts")).default;
+    }
+    catch {
+        cachedConfig = require("../config/cache").default;
+    }
+    return cachedConfig;
+};
+/** Builds cache operations for the configured driver (local filesystem or Redis). */
 export default class CacheBuilder {
+    /** The loaded cache configuration object. */
     conf;
+    /** The name of the active cache connection. */
     conn;
+    /** The prefix prepended to every cache key. */
     prefix;
+    /** The lazily-initialized Redis client instance. */
     rds;
+    /** Loads cache configuration from the app config or the built-in default. */
     constructor() {
-        const configPath = App.Path.configPath("cache.ts");
-        let config;
-        if (fs.existsSync(configPath))
-            config = require(configPath).default;
-        else
-            config = CacheConfig;
-        this.conf = config;
+        this.conf = loadConfig();
         this.prefix = "bejibun-cache";
     }
+    /**
+     * Lazily creates and returns the Redis client for the configured connection.
+     *
+     * @returns {Record<string, any>} The client bound to the cache prefix.
+     */
     get redis() {
         if (isEmpty(this.rds)) {
-            const redisConnection = defineValue(this.conf.connections?.redis, {
-                host: "127.0.0.1",
-                port: 6379,
-                password: "",
-                database: 0
-            });
-            this.rds = Redis.setClient({
-                host: redisConnection.host,
-                port: redisConnection.port,
-                password: redisConnection.password,
-                database: redisConnection.database
-            }, this.prefix);
-            return this.rds;
+            let client = cachedClients.get(this.prefix);
+            if (isEmpty(client)) {
+                const redisConnection = defineValue(this.conf.connections?.redis, {
+                    host: "127.0.0.1",
+                    port: 6379,
+                    password: "",
+                    database: 0
+                });
+                client = Redis.setClient({
+                    host: redisConnection.host,
+                    port: redisConnection.port,
+                    password: redisConnection.password,
+                    database: redisConnection.database
+                }, this.prefix);
+                cachedClients.set(this.prefix, client);
+            }
+            this.rds = client;
         }
         return this.rds;
     }
+    /**
+     * Returns the loaded cache configuration, throwing when none is provided.
+     *
+     * @throws {CacheException} When no config is present.
+     * @returns {Record<string, any>} The loaded cache configuration.
+     */
     get config() {
         if (isEmpty(this.conf))
             throw new CacheException("There is no config provided.");
         return this.conf;
     }
+    /**
+     * Returns the active connection config, falling back to the default connection.
+     *
+     * @returns {any} The active connection definition.
+     */
     get currentConnection() {
         return this.config.connections[defineValue(this.conn, this.config.default)];
     }
+    /**
+     * Resolves and validates the current cache driver.
+     *
+     * @throws {CacheException} When the driver is missing, unsupported, or misconfigured.
+     * @returns {any} The resolved driver name.
+     */
     get driver() {
         const driver = defineValue(this.currentConnection?.driver);
         if (isEmpty(driver))
             throw new CacheException(`Missing "driver" on cache config.`);
-        if (!Enum.setEnums(CacheDriverEnum).hasValue(driver))
+        if (!validDrivers.has(driver))
             throw new CacheException(`Not supported "driver" cache.`);
         switch (driver) {
             case CacheDriverEnum.Local:
@@ -72,25 +119,57 @@ export default class CacheBuilder {
         }
         return driver;
     }
+    /**
+     * Builds a normalized storage key from the prefix and input key.
+     *
+     * @param {string} key - Raw cache key.
+     * @returns {string} The normalized storage key.
+     */
     key(key) {
         return `${this.prefix}-${key.replaceAll("/", "-").replaceAll(" ", "-")}`;
     }
+    /**
+     * Resolves the absolute file path for a local cache entry.
+     *
+     * @param {string} key - Raw cache key.
+     * @returns {string} The absolute cache file path.
+     */
     filePath(key) {
         return path.resolve(this.currentConnection.path, `${this.key(key)}.cache`);
     }
+    /**
+     * Returns the Bun file handle for a local cache entry.
+     *
+     * @param {string} key - Raw cache key.
+     * @returns {Bun.BunFile} The file handle for the cache entry.
+     */
     file(key) {
         return Bun.file(this.filePath(key));
     }
+    /**
+     * Writes a local cache entry, preserving an existing TTL when none is given.
+     *
+     * @param {string} key - Raw cache key.
+     * @param {any} data - Value to store.
+     * @param {number} ttl - Time to live in seconds.
+     * @returns {Promise<number>} Bytes written to the cache file.
+     */
     async setFile(key, data, ttl) {
         ttl = defineValue(ttl, "");
         if (isNotEmpty(ttl))
-            ttl = Luxon.DateTime.now().toUnixInteger() + ttl;
+            ttl = unix() + Number(ttl);
         const raw = await this.getFile(key);
         if (isNotEmpty(raw.ttl))
             ttl = Number(raw.ttl);
-        await fs.promises.mkdir(this.currentConnection.path, { recursive: true });
+        await mkdir(this.currentConnection.path, { recursive: true });
         return await Bun.write(this.filePath(key), `${ttl}|${data}`);
     }
+    /**
+     * Reads and expires a local cache entry, returning empty metadata on miss.
+     *
+     * @param {string} key - Raw cache key.
+     * @returns {Promise<CacheFile>} The entry metadata, or empty on miss.
+     */
     async getFile(key) {
         let metadata = {
             ttl: null,
@@ -100,10 +179,10 @@ export default class CacheBuilder {
             const file = this.file(key);
             if (await file.exists()) {
                 const raw = await file.text();
-                const [unix, ...rest] = raw.split("|");
-                const ttl = Number(unix);
+                const [unixTimestamp, ...rest] = raw.split("|");
+                const ttl = Number(unixTimestamp);
                 const data = rest.join("|");
-                if (isEmpty(ttl) || Luxon.DateTime.now().toUnixInteger() <= ttl)
+                if (isEmpty(ttl) || unix() <= ttl)
                     metadata = {
                         ttl: defineValue(Number(ttl)),
                         data
@@ -119,10 +198,24 @@ export default class CacheBuilder {
         }
         return metadata;
     }
+    /**
+     * Sets the connection to use for subsequent operations.
+     *
+     * @param {string} conn - Connection name.
+     * @returns {CacheBuilder} The builder bound to the connection.
+     */
     connection(conn) {
         this.conn = conn;
         return this;
     }
+    /**
+     * Gets a key, invoking the callback to populate it when missing.
+     *
+     * @param {string} key - Cache key.
+     * @param {Function} callback - Function that produces the value.
+     * @param {number} ttl - Time to live in seconds.
+     * @returns {Promise<any>} The remembered value.
+     */
     async remember(key, callback, ttl) {
         let data;
         switch (this.driver) {
@@ -148,6 +241,12 @@ export default class CacheBuilder {
         }
         return data;
     }
+    /**
+     * Checks whether a key exists.
+     *
+     * @param {string} key - Cache key.
+     * @returns {Promise<boolean>} Whether the key exists.
+     */
     async has(key) {
         let data;
         switch (this.driver) {
@@ -165,6 +264,12 @@ export default class CacheBuilder {
         }
         return isNotEmpty(data);
     }
+    /**
+     * Retrieves a cached value.
+     *
+     * @param {string} key - Cache key.
+     * @returns {Promise<any>} The cached value, or empty when missing.
+     */
     async get(key) {
         let data;
         switch (this.driver) {
@@ -182,6 +287,14 @@ export default class CacheBuilder {
         }
         return data;
     }
+    /**
+     * Adds a value only if the key does not already exist.
+     *
+     * @param {string} key - Cache key.
+     * @param {any} value - Value to store.
+     * @param {number} ttl - Time to live in seconds.
+     * @returns {Promise<boolean>} Whether the value was newly stored.
+     */
     async add(key, value, ttl) {
         let status = true;
         let data;
@@ -222,6 +335,14 @@ export default class CacheBuilder {
         }
         return status;
     }
+    /**
+     * Stores a value, overwriting any existing entry.
+     *
+     * @param {string} key - Cache key.
+     * @param {any} value - Value to store.
+     * @param {number} ttl - Time to live in seconds.
+     * @returns {Promise<boolean>} Whether the value was stored.
+     */
     async put(key, value, ttl) {
         let status = true;
         try {
@@ -242,6 +363,11 @@ export default class CacheBuilder {
         }
         return status;
     }
+    /**
+     * Removes a cached value.
+     *
+     * @param {string} key - Cache key.
+     */
     async forget(key) {
         switch (this.driver) {
             case CacheDriverEnum.Local:
@@ -259,6 +385,13 @@ export default class CacheBuilder {
                 break;
         }
     }
+    /**
+     * Increments a numeric cache value by one.
+     *
+     * @param {string} key - Cache key.
+     * @param {number} ttl - Time to live in seconds.
+     * @returns {Promise<number>} The value after increment.
+     */
     async increment(key, ttl) {
         let data;
         switch (this.driver) {
@@ -292,6 +425,13 @@ export default class CacheBuilder {
         }
         return data;
     }
+    /**
+     * Decrements a numeric cache value by one.
+     *
+     * @param {string} key - Cache key.
+     * @param {number} ttl - Time to live in seconds.
+     * @returns {Promise<number>} The value after decrement.
+     */
     async decrement(key, ttl) {
         let data;
         switch (this.driver) {
@@ -325,6 +465,14 @@ export default class CacheBuilder {
         }
         return data;
     }
+    /**
+     * Increments a numeric cache value by a given amount.
+     *
+     * @param {string} key - Cache key.
+     * @param {number} increment - Amount to add.
+     * @param {number} ttl - Time to live in seconds.
+     * @returns {Promise<number>} The value after increment.
+     */
     async incrementBy(key, increment, ttl) {
         let data;
         switch (this.driver) {
@@ -358,6 +506,14 @@ export default class CacheBuilder {
         }
         return data;
     }
+    /**
+     * Decrements a numeric cache value by a given amount.
+     *
+     * @param {string} key - Cache key.
+     * @param {number} decrement - Amount to subtract.
+     * @param {number} ttl - Time to live in seconds.
+     * @returns {Promise<number>} The value after decrement.
+     */
     async decrementBy(key, decrement, ttl) {
         let data;
         switch (this.driver) {

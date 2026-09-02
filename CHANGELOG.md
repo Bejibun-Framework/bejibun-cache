@@ -3,6 +3,52 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v0.1.26](https://github.com/Bejibun-Framework/bejibun-cache/compare/v0.1.25...v0.1.26) - 2026-09-02
+
+### 🩹 Fixes
+
+### 📖 Changes
+#### Performance
+- `CacheBuilder` now loads the cache config once (module-level cache) instead of re-reading it from disk (`App.Path.configPath` + `fs.existsSync` + `require()`) on **every** builder creation
+- The driver getter now validates against a module-level `Set` of valid drivers instead of rebuilding the enum and scanning `Object.keys()` on **every** access
+- Redis clients are now reused per prefix from a module-level `Map` instead of creating a fresh `Redis.setClient` connection per builder, eliminating per-op reconnects
+- `setFile`/`getFile` now use a native unix timestamp instead of the `Luxon.DateTime` facade
+- Removed the now-unused `Luxon` and `Enum` imports
+- Added `tests` to tsconfig `exclude` so compiled output never lands in `tests/`
+
+### 🧪 Tests
+- Added test suite (14 tests across 1 file) covering config caching, driver validation, local-driver `put`/`get`/`has`/`add`/`forget`/`remember`/`flush`/`expires`, and default-config resolution, with silenced logger output
+
+### ⚡ Benchmarks
+- Added benchmark suite comparing baseline (`@bejibun/cache@0.1.25`) vs optimized build
+- **construction throughput (builder + driver resolution): ~17.06x faster** (117.8ms vs 6.9ms for 20k calls, ~2.89M ops/s)
+- **redis `Cache.put()` throughput (live server): ~2.45x faster** (4734.1ms vs 1930.7ms for 20k calls)
+- **redis `Cache.get()` throughput (live server): ~1.65x faster** (3315.4ms vs 2010.8ms for 20k calls)
+- **redis `Cache.has()` throughput (live server): ~1.65x faster** (3308.6ms vs 2008.1ms for 20k calls)
+- Cold start: ~1.05x
+
+### 📦 Dependencies
+
+- Bumped [`@bejibun/app`](https://github.com/Bejibun-Framework/bejibun-app) from `^0.1.25` to `^0.1.26`
+- Bumped [`@bejibun/logger`](https://github.com/Bejibun-Framework/bejibun-logger) from `^0.1.23` to `^0.2.1`
+- Bumped [`@bejibun/redis`](https://github.com/Bejibun-Framework/bejibun-redis) from `^0.1.47` to `^0.1.48`
+- Bumped [`@bejibun/utils`](https://github.com/Bejibun-Framework/bejibun-utils) from `^0.1.29` to `^0.1.30`
+- Bumped `@types/bun` (devDependency) from `^1.3.14` to `^1.4.0`
+- Bumped `eslint` (devDependency) from `^10.8.1` to `^10.9.1`
+- Bumped `globals` (devDependency) from `^17.11.0` to `^17.12.0`
+- Bumped `tsc-alias` (devDependency) from `^1.9.2` to `^1.9.3`
+- Bumped `typescript-eslint` (devDependency) from `^8.67.0` to `^8.69.0`
+
+### 📦 Dependencies
+- Upgraded `@bejibun/redis` to v0.1.46
+
+### ❤️Contributors
+- Havea Crenata ([@crenata](https://github.com/crenata))
+
+**Full Changelog**: https://github.com/Bejibun-Framework/bejibun-cache/blob/master/CHANGELOG.md
+
+---
+
 ## [v0.1.25](https://github.com/Bejibun-Framework/bejibun-cache/compare/v0.1.24...v0.1.25) - 2026-08-20
 
 ### 🩹 Fixes

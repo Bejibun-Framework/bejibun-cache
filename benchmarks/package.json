@@ -1,0 +1,12 @@
+{
+    "name": "@bejibun/cache-benchmarks",
+    "private": true,
+    "type": "module",
+    "description": "Speed comparison: baseline (previously published npm release) vs the optimized @bejibun/cache in this repo. Run with `bun run`.",
+    "scripts": {
+        "install-deps": "bun install --cwd .. --no-save \"@bejibun-baseline/cache@npm:@bejibun/cache@0.1.25\"",
+        "coldstart": "bun run scripts/coldstart.mjs && prettier --write . --log-level=silent",
+        "throughput": "bun run scripts/throughput.mjs && prettier --write . --log-level=silent",
+        "bench": "bun run install-deps && bun run coldstart && bun run throughput"
+    }
+}

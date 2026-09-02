@@ -13,5 +13,6 @@
             "@/*": ["./src/*"]
         },
         "types": ["bun-types"]
-    }
+    },
+    "exclude": ["tests"]
 }
