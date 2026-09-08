@@ -1,2 +1,2 @@
 /** Re-exports Cache type declarations. */
-export * from "../types/cache";
+export * from "./cache";
